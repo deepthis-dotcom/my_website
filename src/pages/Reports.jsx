@@ -1,0 +1,7 @@
+import { Download } from 'lucide-react';
+import { students } from '../data/demo';
+import { attendancePercent } from '../utils/attendance';
+export default function Reports(){
+ const download=()=>{const rows=[['Student ID','Name','Department','Attended','Conducted','Attendance %'],...students.map(s=>[s.id,s.name,s.dept,s.attended,s.conducted,attendancePercent(s.attended,s.conducted).toFixed(2)])];const csv=rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(',')).join('\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));const a=document.createElement('a');a.href=url;a.download='smarttendance-report.csv';a.click();URL.revokeObjectURL(url);};
+ return <><div className="page-heading"><div><p className="eyebrow">ANALYTICS</p><h1>Reports</h1><p className="muted">Export the sample attendance data as a CSV file.</p></div><button className="primary-button" onClick={download}><Download size={16}/> Export CSV</button></div><div className="panel"><h2>Report preview</h2><p className="muted">This report currently uses local demo data. Connect the backend before relying on it.</p><div className="report-metrics"><div><small>Students in sample</small><strong>{students.length}</strong></div><div><small>Below 75%</small><strong>{students.filter(s=>attendancePercent(s.attended,s.conducted)<75).length}</strong></div><div><small>Average attendance</small><strong>{(students.reduce((a,s)=>a+attendancePercent(s.attended,s.conducted),0)/students.length).toFixed(1)}%</strong></div></div></div></>;
+}

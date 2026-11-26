@@ -1,0 +1,17 @@
+import { motion } from 'framer-motion';
+import { Activity, ArrowUpRight, CalendarDays } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import StatCard from '../components/StatCard';
+import { demoStats, attendanceTrend, students } from '../data/demo';
+import { attendancePercent } from '../utils/attendance';
+export default function Dashboard() {
+  return <motion.div initial={{opacity:0}} animate={{opacity:1}}>
+    <div className="page-heading"><div><p className="eyebrow">WEDNESDAY · OVERVIEW</p><h1>Good morning, Admin <span>✦</span></h1><p className="muted">Here’s what’s happening across your institution today.</p></div><button className="primary-button"><CalendarDays size={16}/> Today</button></div>
+    <section className="stats-grid">{demoStats.map((item,i)=><StatCard key={item.label} item={item} index={i}/>)}</section>
+    <section className="content-grid">
+      <div className="panel chart-panel"><div className="panel-heading"><div><h2>Attendance overview</h2><p className="muted">Weekly attendance trend</p></div><span className="pill positive"><Activity size={13}/> +4.8%</span></div><div className="chart"><ResponsiveContainer width="100%" height="100%"><AreaChart data={attendanceTrend}><defs><linearGradient id="fillAttendance" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#8b7cff" stopOpacity={.35}/><stop offset="100%" stopColor="#8b7cff" stopOpacity={0}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" stroke="#273247"/><XAxis dataKey="day" stroke="#8792a6" axisLine={false} tickLine={false}/><YAxis domain={[0,100]} stroke="#8792a6" axisLine={false} tickLine={false}/><Tooltip contentStyle={{background:'#172235',border:'1px solid #34415a',borderRadius:12}}/><Area type="monotone" dataKey="attendance" stroke="#9a8cff" strokeWidth={3} fill="url(#fillAttendance)"/></AreaChart></ResponsiveContainer></div></div>
+      <div className="panel"><div className="panel-heading"><div><h2>Quick insights</h2><p className="muted">Live system snapshot</p></div><ArrowUpRight size={18}/></div><div className="insight"><span className="insight-dot green"></span><div><b>88.6% present today</b><small>Institution-wide average</small></div></div><div className="insight"><span className="insight-dot yellow"></span><div><b>37 shortage alerts</b><small>Students below 75%</small></div></div><div className="insight"><span className="insight-dot purple"></span><div><b>12 active subjects</b><small>Sessions scheduled today</small></div></div><div className="progress-block"><div><span>Daily attendance target</span><b>88.6%</b></div><div className="progress"><span style={{width:'88.6%'}}/></div></div></div>
+    </section>
+    <section className="panel table-panel"><div className="panel-heading"><div><h2>Students to monitor</h2><p className="muted">Sample records with attendance below target</p></div><a href="/students">View directory →</a></div><div className="table-wrap"><table><thead><tr><th>STUDENT</th><th>DEPARTMENT</th><th>SEMESTER</th><th>ATTENDANCE</th><th>STATUS</th></tr></thead><tbody>{students.filter(s=>attendancePercent(s.attended,s.conducted)<80).slice(0,4).map(s=>{const p=attendancePercent(s.attended,s.conducted);return <tr key={s.id}><td><b>{s.name}</b><small>{s.id}</small></td><td>{s.dept}</td><td>{s.semester}</td><td><b>{p.toFixed(1)}%</b></td><td><span className={p<75?'status danger':'status warning'}>{p<75?'Shortage':'Monitor'}</span></td></tr>})}</tbody></table></div></section>
+  </motion.div>;
+}
